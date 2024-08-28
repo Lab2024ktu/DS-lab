@@ -1,0 +1,223 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define the node structure
+struct node {
+    int data;
+    struct node *next;
+} *head = NULL;
+
+// Function declarations
+void inB(int val);
+void inE(int val);
+void inS(int val, int loc);
+void deB();
+void deE();
+void deS(int loc);
+void dis();
+
+int main() {
+    int ch, val, loc;
+    for (;;) {
+        printf("\nA.Insert:\t1.At Beginning\t2.At End\t3.At Specific Location");
+        printf("\nB.Delete:\t4.At Beginning\t5.At End\t6.At Specific Location");
+        printf("\n7.Display\t8.Exit\tChoice: ");
+        scanf("%d", &ch);
+        switch (ch) {
+            case 1:
+                printf("Enter value: ");
+                scanf("%d", &val);
+                inB(val);
+                break;
+            case 2:
+                printf("Enter value: ");
+                scanf("%d", &val);
+                inE(val);
+                break;
+            case 3:
+                printf("Enter value: ");
+                scanf("%d", &val);
+                printf("Enter location: ");
+                scanf("%d", &loc);
+                inS(val, loc);
+                break;
+            case 4:
+                deB();
+                break;
+            case 5:
+                deE();
+                break;
+            case 6:
+                printf("Enter location: ");
+                scanf("%d", &loc);
+                deS(loc);
+                break;
+            case 7:
+                dis();
+                break;
+            case 8:
+                return 0;
+            default:
+                printf("Invalid input\n");
+        }
+    }
+}
+
+// Insert at the beginning
+void inB(int val) {
+    struct node *newnode = (struct node *)malloc(sizeof(struct node));
+    newnode->data = val;
+    if (head == NULL) {
+        newnode->next = newnode; // Point to itself
+        head = newnode;
+    } else {
+        struct node *temp = head;
+        while (temp->next != head)
+            temp = temp->next; // Traverse to the last node
+        newnode->next = head;
+        temp->next = newnode;
+        head = newnode; // Update head to the new node
+    }
+}
+
+// Insert at the end
+void inE(int val) {
+    struct node *newnode = (struct node *)malloc(sizeof(struct node));
+    newnode->data = val;
+    if (head == NULL) {
+        newnode->next = newnode; // Point to itself
+        head = newnode;
+    } else {
+        struct node *temp = head;
+        while (temp->next != head)
+            temp = temp->next; // Traverse to the last node
+        temp->next = newnode;
+        newnode->next = head;
+    }
+}
+
+// Insert at a specific location
+void inS(int val, int loc) {
+    struct node *newnode = (struct node *)malloc(sizeof(struct node));
+    newnode->data = val;
+
+    // Check if list is empty and location is greater than 1
+    if (head == NULL && loc > 1) {
+        printf("Invalid location. The position is beyond the list length.\n");
+        free(newnode);
+        return;
+    }
+
+    if (loc == 1) { // Insert at the beginning
+        if (head == NULL) {
+            newnode->next = newnode; // Point to itself
+            head = newnode;
+        } else {
+            struct node *temp = head;
+            while (temp->next != head)
+                temp = temp->next; // Traverse to the last node
+            newnode->next = head;
+            temp->next = newnode;
+            head = newnode; // Update head to the new node
+        }
+        return;
+    }
+
+    struct node *temp = head;
+    for (int i = 1; i < loc - 1; i++) {
+        temp = temp->next;
+        if (temp == head) {
+            printf("Invalid location. The position is beyond the list length.\n");
+            free(newnode);
+            return;
+        }
+    }
+    newnode->next = temp->next;
+    temp->next = newnode;
+}
+// Delete from the beginning
+void deB() {
+    if (head == NULL) {
+        printf("Empty List\n");
+        return;
+    }
+    struct node *temp = head, *last = head;
+    if (head->next == head) { // Only one node in the list
+        free(head);
+        head = NULL;
+    } else {
+        while (last->next != head)
+            last = last->next; // Find the last node
+        head = head->next;
+        last->next = head;
+        free(temp);
+    }
+}
+// Delete from the end
+void deE() {
+    if (head == NULL) {
+        printf("Empty List\n");
+        return;
+    }
+    struct node *temp = head, *prev = NULL;
+    if (head->next == head) { // Only one node in the list
+        free(head);
+        head = NULL;
+    } else {
+        while (temp->next != head) {
+            prev = temp;
+            temp = temp->next;
+        }
+        prev->next = head;
+        free(temp);
+    }
+}
+// Delete from a specific location
+void deS(int loc) {
+    if (head == NULL) {
+        printf("Empty List\n");
+        return;
+    }
+    struct node *temp = head, *prev = NULL;
+    if (loc == 1) { // Delete the head node
+        if (head->next == head) { // Only one node in the list
+            free(head);
+            head = NULL;
+        } else {
+            struct node *last = head;
+            while (last->next != head)
+                last = last->next; // Find the last node
+            last->next = head->next;
+            free(head);
+            head = last->next;
+        }
+        return;
+    }
+
+    for (int i = 1; i < loc; i++) {
+        prev = temp;
+        temp = temp->next;
+        if (temp == head) {
+            printf("Invalid location. The position is beyond the list length.\n");
+            return;
+        }
+    }
+
+    prev->next = temp->next;
+    free(temp);
+}
+
+// Display the list
+void dis() {
+    if (head == NULL) {
+        printf("Empty List\n");
+    } else {
+        struct node *temp = head;
+        printf("List: ");
+        do {
+            printf("%d -> ", temp->data);
+            temp = temp->next;
+        } while (temp != head);
+        printf("(head)\n");
+    }
+}
